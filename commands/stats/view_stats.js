@@ -1,27 +1,7 @@
 const commando = require('discord.js-commando');
 const sql = require("sqlite");
 
-async function getPlayerID(playerName){
-    //TODO CHECK SMURF NAMES
 
-    await sql.get("SELECT * FROM players WHERE playerName = (?)", playerName).then(row => {
-        if (!row) {
-          console.log("Player doesn't exist.");
-          sql.run("INSERT INTO players VALUES (NULL,?)", playerName);
-        }else {
-            console.log("Player exists.");
-        };
-      });
-    
-
-
-    var playerName = "";
-    await sql.get("SELECT playerName AS name FROM players WHERE playerID = (?)", playerID).then(row => {
-        playerName = row.id;
-        console.log(playerName);
-      });
-    return playerName;
-}
 
 class ViewStatsCommand extends commando.Command{
     constructor(client){
@@ -38,26 +18,80 @@ class ViewStatsCommand extends commando.Command{
                 }
             ]
         });
+        this.playerName;
+        this.playerID;
+        this.totalGames;
+        this.gamesArray = [];
+        this.gamesWonArray = [];
+        this.gamesLostArray = [];
+        this.wins;
+        this.losses;
+        this.winPercentage = [];
+        this.currentRank;
     }
-
-    async run(message, {playerName}){
-        await sql.open("./sql/stats.sqlite");
+    
+    run(message, {gameData}){
         message.reply("Dodge is the best player in Australia and all the ladies wish he'd blue plate them.");
-        var inserts = playerName;
-        //"SELECT * FROM players WHERE playerName = (?)", inserts
+        return sql.open("./sql/stats.sqlite").then(() => {
+            return this.getPlayerID(gameData);
+        })
+        .then(() => {
+            if(this.playerID != -1){
+                //return calculateWinPercentage();
+            }
+        })
+        .then(() => {
+/*
+            return Promise.all([
+                message.reply(this.playerName +
+                  "\nWin Percentage: " + this.winPercentage[2]  +
+                  "\nBlood Eagle Percentage: " + this.winPercentage[0]  +
+                  "\nDiamond Sword Percentage: " + this.winPercentage[1]  +
+                  "\nCurrent Rank: " + this.currentRank
+                ),
+                sql.close()
+              ]);
+*/
+        });
 
-        var playerID = await getPlayerID(playerName);
-
-        var winSql = "SELECT player, \
-        COUNT(*) AS TotalGames,\
-        SUM(CASE WHEN condition='win' THEN 1 ELSE 0 END) AS Wins,\
-        COUNT(*)-SUM(CASE WHEN condition='win' THEN 1 ELSE 0 END) AS Losses,\
-        SUM(CASE WHEN condition='win' THEN 1 ELSE 0 END)*100/COUNT(*) AS WinPercentage\
-        FROM tenis_table\
-        GROUP BY player";
-        
-        sql.close();
     }
-}
 
+    getPlayerID(gameData) {
+        this.playerID = 0;
+        return sql.get("SELECT playerID AS id FROM players WHERE playerName = (?)", gameData).then(row => {
+            if(!row){
+                this.playerID = -1;
+                this.playerName = "";
+                return this;
+            }else{
+                this.playerID = row.id;
+                this.playerName = gameData;
+                return this;
+            }
+        });
+      }
+
+      calculateWinPercentage(){
+        //TODO actually learn how to write sql, this isn't even close to working.
+        var winRateSql = "SELECT gamePlayerTeam.gameID, gamePlayerTeam.playerID, gamePlayerTeam.teamID, gameScore.score\
+        FROM ((gamePlayerTeam\
+        INNER JOIN gamePlayerTeam ON gamePlayerTeam.playerID = (?))\
+        INNER JOIN gameScore ON gamePlayerTeam.gameID = gameScore.gameID)\
+        WHERE gamePlayerTeam.playerID = (?);";
+        
+        return sql.get(winRateSql,playerID).then(row => {
+            if(!row){
+            }else{
+                this.totalGames = row.TotalGames;
+                this.wins = row.Wins;
+                this.losses = row.losses;
+                this.winPercentage.push(row.WinPercentage);
+                this.winPercentage.push(row.WinPercentageBE);
+                this.winPercentage.push(row.WinPercentageDS);
+                return this;
+            }
+        });
+      }
+}
 module.exports = ViewStatsCommand;
+

@@ -33,7 +33,7 @@ class ViewLatestGameStatsCommand extends commando.Command{
       var dsScore = data[1];
       var winner = beScore > dsScore ? "Blood Eagle" : "Diamond Sword";
       return Promise.all([
-        message.reply("Map: " + this.getMap() +
+        message.reply("Map: " + this.mapName +
           "\nWinnder: " + winner  +
           "\nBlood Eagle Score: " + beScore  +
           "\nDiamond Sword Score: " + dsScore +
@@ -47,7 +47,7 @@ class ViewLatestGameStatsCommand extends commando.Command{
 
   getLatestGameID() {
     this.gameID = 0;
-    return sql.get("SELECT MAX(gameID) AS id FROM gameStats").then(row => {
+    return sql.get("SELECT MAX(gameID) AS id FROM gameMap").then(row => {
       this.gameID = row.id;
       return this;
     });
@@ -57,13 +57,13 @@ class ViewLatestGameStatsCommand extends commando.Command{
     var passed = true;
     var mapID = 0;
 
-    return sql.get("SELECT * FROM gameStats WHERE gameID = (?)", this.gameID).then(row => {
+    return sql.get("SELECT * FROM gameMap WHERE gameID = (?)", this.gameID).then(row => {
       if(!row){
         console.error("gameID does not exist!");
         mapName = -1;
         return
       }
-      return sql.get("SELECT mapID as id FROM gameStats WHERE gameID = (?)", this.gameID).then(row => {
+      return sql.get("SELECT mapID as id FROM gameMap WHERE gameID = (?)", this.gameID).then(row => {
         mapID = row.id;
         return sql.get("SELECT mapName as name FROM maps WHERE mapID = (?)", mapID).then(row => {
           this.mapName = row.name;
@@ -74,26 +74,27 @@ class ViewLatestGameStatsCommand extends commando.Command{
   }
 
   getScore(teamID){
-    return sql.get("SELECT * FROM gameInfo WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
+    return sql.get("SELECT * FROM gameScore WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
       if(!row){
         console.error("Matching gameID and teamID doesn not exist!");
         return
       }
-      return sql.get("SELECT score as score FROM gameInfo WHERE gameID = (?) AND teamID = (?)", this.gameID,teamID).then(row => {
-       row.score;
+      return sql.get("SELECT score as score FROM gameScore WHERE gameID = (?) AND teamID = (?)", this.gameID,teamID).then(row => {
+       return row.score;
       });
     });
   }
 
   getPlayers(teamID){
-    sql.get("SELECT * FROM gameInfo WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
+    sql.get("SELECT * FROM gamePlayerTeam WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
       if(!row) {
         console.error("Matching gameID and teamID doesn not exist!");
         return
       }
     });
-    return sql.each("SELECT playerID as id FROM gamePlayerInfo WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
+    return sql.each("SELECT playerID as id FROM gamePlayerTeam WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
       return sql.get("SELECT playerName as name FROM players WHERE playerID = (?)", row.id).then(row => {
+        //Todo work out why it's only printing 1 player from each team
         if(teamID == 0){
           this.bePlayers.push(row.name);
         } else {
@@ -102,5 +103,6 @@ class ViewLatestGameStatsCommand extends commando.Command{
         return;
     });
   });
-}}
+  }
+}
 module.exports = ViewLatestGameStatsCommand;
