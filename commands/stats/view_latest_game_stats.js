@@ -27,21 +27,15 @@ class ViewLatestGameStatsCommand extends commando.Command{
         this.getPlayers(0),
         this.getPlayers(1)
       ]);
-    })
-    .then(data => {
-      var beScore = data[0];
-      var dsScore = data[1];
-      var winner = beScore > dsScore ? "Blood Eagle" : "Diamond Sword";
-      return Promise.all([
-        message.reply("Map: " + this.mapName +
-          "\nWinnder: " + winner  +
-          "\nBlood Eagle Score: " + beScore  +
-          "\nDiamond Sword Score: " + dsScore +
-          "\nBlood Ealge Players: " + this.bePlayers.join(', ') +
-          "\nDiamond Sword Players: " + this.dsPlayers.join(', ')
-        ),
-        sql.close()
-      ]);
+    }).then(data => {
+      message.reply("Map: " + this.mapName +
+        "\nWinnder: " + data[0] > data[1] ? "Blood Eagle" : "Diamond Sword"  +
+        "\nBlood Eagle Score: " + data[0]  +
+        "\nDiamond Sword Score: " + data[1] +
+        "\nBlood Ealge Players: " + this.bePlayers.join(', ') +
+        "\nDiamond Sword Players: " + this.dsPlayers.join(', '));
+    }).then(()=>{
+      sql.close();
     });
   }
 
@@ -86,21 +80,21 @@ class ViewLatestGameStatsCommand extends commando.Command{
   }
 
   getPlayers(teamID){
-    sql.get("SELECT * FROM gamePlayerTeam WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
+    var inserts = [this.gameID, teamID];
+    sql.get("SELECT * FROM gameScore WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
       if(!row) {
         console.error("Matching gameID and teamID doesn not exist!");
         return
       }
     });
-    return sql.each("SELECT playerID as id FROM gamePlayerTeam WHERE gameID = (?) AND teamID = (?)", this.gameID, teamID).then(row => {
+    return sql.each("SELECT playerID as id FROM gamePlayerTeam WHERE gameID = (?) AND teamID = (?)",inserts,(err ,row) =>{
       return sql.get("SELECT playerName as name FROM players WHERE playerID = (?)", row.id).then(row => {
-        //Todo work out why it's only printing 1 player from each team
         if(teamID == 0){
           this.bePlayers.push(row.name);
         } else {
           this.dsPlayers.push(row.name);
         }
-        return;
+        return this;
     });
   });
   }

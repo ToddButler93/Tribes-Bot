@@ -69,6 +69,8 @@ class InsertGameCommand extends commando.Command{
                     "\nDiamond Sword Score: " + this.dsScore + 
                     "\nBlood Ealge Players: " + this.beGameData[2] + ", "+ this.beGameData[3] + ", "+ this.beGameData[4] + ", "+ this.beGameData[5] + ", "+ this.beGameData[6] + ", "+ this.beGameData[7] + ", "+ this.beGameData[8] +
                     "\nDiamond Sword Players: " + this.dsGameData[2] + ", "+ this.dsGameData[3] + ", "+ this.dsGameData[4] + ", "+ this.dsGameData[5] + ", "+ this.dsGameData[6] + ", "+ this.dsGameData[7] + ", "+ this.dsGameData[8]);
+    }).then(()=>{
+        sql.close();
     });
   }
 
@@ -83,23 +85,23 @@ class InsertGameCommand extends commando.Command{
     insertMap(){
     return sql.get("SELECT * FROM maps WHERE mapName = (?)", this.mapName).then(row => {
         if (!row) {
-            console.log("Inserting Map.");
             return sql.run("INSERT INTO maps VALUES (NULL,?)", this.mapName).then(row => {
                 return sql.get("SELECT mapID as id FROM maps WHERE mapName = (?)", this.mapName).then(row => {
                     this.mapID = row.id;
+                    console.log("Map inserted: " + this.mapID + ":" + this.mapName);
                     return
                 });
             });
         }else {
-            console.log("Map exists.");
             return sql.get("SELECT mapID as id FROM maps WHERE mapName = (?)", this.mapName).then(row => {
                 this.mapID = row.id;
+                console.log("Map exists: " + this.mapID + ":" + this.mapName);
                 return
             });
         }
       });
     }
-    //Todo test if function even works properly.
+    
     async insertPlayers(){
         for(var i = 0; i < 7; i++){
             var playerID = await this.insertPlayer(this.beGameData[i + 2]);
@@ -120,7 +122,6 @@ class InsertGameCommand extends commando.Command{
                     });
                 });
             }else {
-                console.log("Player exists.");
                 return sql.get("SELECT playerID AS id FROM players WHERE playerName = (?)", playerName).then(row => {
                     console.log("Grabbed " + row.id+ ":" + playerName + " Data.");
                     return row.id
@@ -130,9 +131,9 @@ class InsertGameCommand extends commando.Command{
     }
 
     insertGameMap(){
-        console.log("Inserting Game Map.");
         return sql.run("INSERT INTO gameMap VALUES (NULL,?)", this.mapID).then(row => {
             return sql.get("SELECT MAX(gameID) AS id FROM gameMap").then(row => {
+                console.log("Inserted Game Map. Game ID: " + row.id);
                 return this.gameID = row.id;
             });
         });
@@ -142,7 +143,7 @@ class InsertGameCommand extends commando.Command{
         var inserts = [gameID, teamID, score];
         return sql.get("SELECT * FROM gameScore WHERE gameID = (?) AND teamID = (?)", gameID,teamID).then(row => {
         if (!row) {
-            console.log("Inserting Score Data.");
+            console.log("Inserted Score Data. GameID: " + gameID + " TeamID: " + teamID + " Score: " + score);
             return sql.run("INSERT INTO gameScore (gameID,teamID,score) VALUES (?,?,?)", inserts);
         }else console.error("Game data with gameID and teamID exists.");
         });
@@ -152,7 +153,7 @@ class InsertGameCommand extends commando.Command{
     var inserts = [gameID, teamID, playerID];
     return sql.get("SELECT * FROM gamePlayerTeam WHERE gameID = (?) AND playerID = (?)", gameID,playerID).then(row => {
         if (!row) {
-          console.log("Inserting Game PlayerInfo.");
+            console.log("Inserted game player. GameID: " + gameID + " TeamID: " + teamID + " PlayerID: " + playerID);
           return sql.run("INSERT INTO gamePlayerTeam (gameID,teamID,playerID) VALUES (?,?,?)", inserts);
         }
       });
