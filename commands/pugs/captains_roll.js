@@ -10,32 +10,54 @@ class CaptainsRollCommand extends commando.Command{
       description: 'Roll for captains.'
     });
     this.playerCount;
-    this.channels = client.channels;
+    this.players = [];
   }
   
   run(message){
-    var channel = bot.channels.get("Pug Org", "Quiet Puggos", "Fat Kids", "Fat Kids(Quiet)").id;
+    var fatKids = this.client.channels.get("435440179554156554");
+    var fatKidsQ = this.client.channels.get("435040441197395988");
+    var pugOrg = this.client.channels.get("413598358738042895");
+    var pugOrgQ = this.client.channels.get("427387468854198273");
+    var fatKidsMems = fatKids.members;
+    var fatKidsQMems = fatKidsQ.members;
+    var pugOrgMems = pugOrg.members;
+    var pugOrgQMems = pugOrgQ.members;
 
-    var rule = new schedule.RecurrenceRule();
-    rule.minute = 0;
-    rule.hour = [14, 19, 20];
+    this.playerCount = 0;
 
-    var j = schedule.scheduleJob(rule, function() {
-        bot.channels.get("id", channel).sendMessage("Testing");
-    })
-
-    console.log("Bot is ready.");
-
-    var chan = this.client.channels['413598358738042895'];
-    var mems = chan.members;
-    console.log(mems.size);
-    for (var x in mems) {
-      console.log(x.userID);
+    for (let [snowflake, guildMember] of fatKidsMems) {
+      console.log('User Added: ' + guildMember.user.username); 
+      this.players.push(guildMember.user.username);
+      this.playerCount++;
     }
-    //var mems = chan.members;
-    //for(var x in mems){
-    //  console.log.x.GuildMember.id;
-    //}
+    for (let [snowflake, guildMember] of fatKidsQMems) {
+      console.log('User Added: ' + guildMember.user.username); 
+      this.players.push(guildMember.user.username);
+      this.playerCount++;
+    }
+    for (let [snowflake, guildMember] of pugOrgMems) {
+      console.log('User Added: ' + guildMember.user.username); 
+      this.players.push(guildMember.user.username);
+      this.playerCount++;
+    }
+    for (let [snowflake, guildMember] of pugOrgQMems) {
+      console.log('User Added: ' + guildMember.user.username); 
+      this.players.push(guildMember.user.username);
+      this.playerCount++;
+    }
+
+    console.log("Player count: " + this.playerCount);
+    if(this.playerCount >= 14){
+      var captainBE = this.players[Math.floor(Math.random() * this.players.length)];
+      var captainDS;
+      while(captainDS == captainBE){
+        captainDS = this.players[Math.floor(Math.random() * this.players.length)];
+      }
+
+      message.reply("Captain Blood Eagle: " + captainBE, "Captain Diamond Sword: " + captainDS);
+    }else{
+      message.reply("Not enough players for pug.");
+    }
   }
 }
 module.exports = CaptainsRollCommand;
