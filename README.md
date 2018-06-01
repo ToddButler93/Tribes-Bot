@@ -28,7 +28,7 @@ SQL Data Layout
 | ------------- 	 | ------------- 		| ------------- 		| ------------- 	| ------------- 		| ------------- 		| ------------- 		|
 | teamID INTEGER[pk] | playerID INTEGER[pk] | smurfName text[pk]	| mapID INTEGER[pk]	| gameID INTEGER[pk]	| gameID INTEGER[pk]	| gameID INTEGER[pk]  	|
 | teamName text  	 | playerName text 		| playerID INTEGER  	| mapName INTEGER  	| mapID INTEGER  		| teamID INTEGER[pk]	| teamID INTEGER  		|
-| 				  	 | 				 		| REF players(playerID)	| 				  	| 						| score INTEGER  		| playerID INTEGER[pk] 	|
-| 				  	 | 				 		| 					  	| 				  	| REF maps(mapID) 		| REF gameMap(gameID) 	| REF gameMap(gameID) 	|
+| 				  	 | 				 		| REF players(playerID)	| 				  	| REF maps(mapID)		| score INTEGER  		| playerID INTEGER[pk] 	|
+| 				  	 | 				 		| 					  	| 				  	| 				 		| REF gameMap(gameID) 	| REF gameMap(gameID) 	|
 | 				  	 | 				 		| 						| 				  	| 						| REF teams(teamID)  	| REF teams(teamID)		|
 | 				  	 | 				 		| 						| 				  	| 						| 					  	| REF players(playerID)	|
