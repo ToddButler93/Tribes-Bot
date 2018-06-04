@@ -31,7 +31,7 @@ class ViewStatsCommand extends commando.Command{
     }
     
     run(message, {gameData}){
-        message.reply("Dodge is the best player in Australia and all the ladies wish he'd blue plate them.");
+        message.channel.send("Dodge is the best player in Australia and all the ladies wish he'd blue plate them.");
         return sql.open("./sql/stats.sqlite").then(() => {
             return this.getPlayerID(gameData);
         })

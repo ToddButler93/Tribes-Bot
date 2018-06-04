@@ -42,11 +42,11 @@ class CaptainsRollCommand extends commando.Command{
       this.captainBE = this.players[this.selectionBE];
       this.captainDS = this.players[this.selectionDS];
     }).then(() => {
-      if(this.playerCount >= 14){
-        message.reply("Captain Blood Eagle: " + this.captainBE);
-        message.reply("Captain Diamond Sword: " + this.captainDS);
+      if(this.playerCount >= 1){
+        message.channel.send("BE: " + this.captainBE +
+        "\nDS: " + this.captainDS);
       }else{
-        message.reply("Not enough players for pug.");
+        message.channel.send("Not enough players for pug.");
       }
     });
   }

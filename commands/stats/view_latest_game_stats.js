@@ -28,7 +28,7 @@ class ViewLatestGameStatsCommand extends commando.Command{
         this.getPlayers(1)
       ]);
     }).then(data => {
-      message.reply("Map: " + this.mapName +
+      message.channel.send("Map: " + this.mapName +
         "\nWinnder: " + data[0] > data[1] ? "Blood Eagle" : "Diamond Sword"  +
         "\nBlood Eagle Score: " + data[0]  +
         "\nDiamond Sword Score: " + data[1] +

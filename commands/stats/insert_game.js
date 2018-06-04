@@ -63,7 +63,7 @@ class InsertGameCommand extends commando.Command{
             return
         }
     }).then(()=>{
-        message.reply("Map: " + this.mapName + 
+        message.channel.send("Map: " + this.mapName + 
                     "\nWinner: " + this.winner  + 
                     "\nBlood Eagle Score: " + this.beScore  + 
                     "\nDiamond Sword Score: " + this.dsScore + 
