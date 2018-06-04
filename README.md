@@ -1,14 +1,24 @@
 # Tribes-Bot
 Node-js Discord bot for Tribes Ascend Stat Data
 
+Create a .env file in directory:
+
+https://discordapp.com/developers/docs/topics/oauth2#bots
+
+TOKEN={bot token} - https://discordapp.com/developers/docs/topics/oauth2#bots
+
+SPREADSHEETID={spreadsheet to get data from ID}
+
+Generate Google Sheets API client_secret, open link in log to to enable credentials. - https://developers.google.com/sheets/api/quickstart/nodejs
+
 Data scheme:
 
 MapName, Blood Eagle Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7
 
 MapName, Diamond Sword Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7
 
-Input data example bulk:
-4/3/18	Game 1	mcoot	1	mcoot1	Arx Novena	Blood Eagle	0
+Input data example bulk from google spreadsheet:
+//Date, Map Name, Blood Eagle Score, BE Player1, BE Player2, BE Player3, BE Player4, BE Player5, BE Player6, BE Player7, Diamond Sword Score, DS Player1, DS Player2, DS Player3, DS Player4, DS Player5, DS Player6, DS Player7
 
 Input data example:
 

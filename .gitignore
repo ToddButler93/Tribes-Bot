@@ -59,3 +59,5 @@ typings/
 
 sql/stats.sqlite
 *.env
+credentials.json
+client_secret.json
