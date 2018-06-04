@@ -11,6 +11,10 @@ class CaptainsRollCommand extends commando.Command{
     });
     this.playerCount;
     this.players = [];
+    this.captainBE;
+    this.captainDS;
+    this.selectionBE;
+    this.selectionDS;
   }
   
   run(message){
@@ -22,41 +26,35 @@ class CaptainsRollCommand extends commando.Command{
     var fatKidsQMems = fatKidsQ.members;
     var pugOrgMems = pugOrg.members;
     var pugOrgQMems = pugOrgQ.members;
-
     this.playerCount = 0;
 
-    for (let [snowflake, guildMember] of fatKidsMems) {
-      console.log('User Added: ' + guildMember.user.username); 
-      this.players.push(guildMember.user.username);
-      this.playerCount++;
-    }
-    for (let [snowflake, guildMember] of fatKidsQMems) {
-      console.log('User Added: ' + guildMember.user.username); 
-      this.players.push(guildMember.user.username);
-      this.playerCount++;
-    }
-    for (let [snowflake, guildMember] of pugOrgMems) {
-      console.log('User Added: ' + guildMember.user.username); 
-      this.players.push(guildMember.user.username);
-      this.playerCount++;
-    }
-    for (let [snowflake, guildMember] of pugOrgQMems) {
-      console.log('User Added: ' + guildMember.user.username); 
-      this.players.push(guildMember.user.username);
-      this.playerCount++;
-    }
-
-    console.log("Player count: " + this.playerCount);
-    if(this.playerCount >= 14){
-      var captainBE = this.players[Math.floor(Math.random() * this.players.length)];
-      var captainDS;
-      while(captainDS == captainBE){
-        captainDS = this.players[Math.floor(Math.random() * this.players.length)];
+    return Promise.all([
+      this.getMembers(fatKidsMems),
+      this.getMembers(fatKidsQMems),
+      this.getMembers(pugOrgMems),
+      this.getMembers(pugOrgQMems)
+    ]).then(() => {
+      console.log("Player count: " + this.playerCount);
+      this.selectionBE = Math.floor(Math.random() * (this.players.length));
+      this.selectionDS = Math.floor(Math.random() * (this.players.length - 1));
+      if(this.selectionDS == this.selectionBE) this.selectionDS++;
+    }).then(() => {
+      this.captainBE = this.players[this.selectionBE];
+      this.captainDS = this.players[this.selectionDS];
+    }).then(() => {
+      if(this.playerCount >= 14){
+        message.reply("Captain Blood Eagle: " + this.captainBE);
+        message.reply("Captain Diamond Sword: " + this.captainDS);
+      }else{
+        message.reply("Not enough players for pug.");
       }
+    });
+  }
 
-      message.reply("Captain Blood Eagle: " + captainBE, "Captain Diamond Sword: " + captainDS);
-    }else{
-      message.reply("Not enough players for pug.");
+  getMembers(members){
+    for (let [snowflake, guildMember] of members) {
+      this.players.push(guildMember.user.username);
+      this.playerCount++;
     }
   }
 }
