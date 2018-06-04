@@ -1,8 +1,8 @@
 const commando = require('discord.js-commando');
 const sql = require("sqlite");
 
-class CaptainsRollCommand extends commando.Command{
-  constructor(client){
+class CaptainsRollCommand extends commando.Command {
+  constructor(client) {
     super(client, {
       name: 'captains',
       group: 'stats',
@@ -16,8 +16,8 @@ class CaptainsRollCommand extends commando.Command{
     this.selectionBE;
     this.selectionDS;
   }
-  
-  run(message){
+
+  run(message) {
     var fatKids = this.client.channels.get("435440179554156554");
     var fatKidsQ = this.client.channels.get("435040441197395988");
     var pugOrg = this.client.channels.get("413598358738042895");
@@ -37,21 +37,21 @@ class CaptainsRollCommand extends commando.Command{
       console.log("Player count: " + this.playerCount);
       this.selectionBE = Math.floor(Math.random() * (this.players.length));
       this.selectionDS = Math.floor(Math.random() * (this.players.length - 1));
-      if(this.selectionDS == this.selectionBE) this.selectionDS++;
+      if (this.selectionDS == this.selectionBE) this.selectionDS++;
     }).then(() => {
       this.captainBE = this.players[this.selectionBE];
       this.captainDS = this.players[this.selectionDS];
     }).then(() => {
-      if(this.playerCount >= 1){
+      if (this.playerCount >= 1) {
         message.channel.send("BE: " + this.captainBE +
-        "\nDS: " + this.captainDS);
-      }else{
+          "\nDS: " + this.captainDS);
+      } else {
         message.channel.send("Not enough players for pug.");
       }
     });
   }
 
-  getMembers(members){
+  getMembers(members) {
     for (let [snowflake, guildMember] of members) {
       this.players.push(guildMember.user.username);
       this.playerCount++;

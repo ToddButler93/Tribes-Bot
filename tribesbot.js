@@ -30,7 +30,7 @@ bot.registry.registerDefaults();
 bot.registry.registerCommandsIn(__dirname + "/commands");
 
 bot.on("ready", () => {
-    return sql.open("./sql/stats.sqlite") .then(()=>{
+    return sql.open("./sql/stats.sqlite").then(() => {
         return Promise.all([
             sql.run(createTeamsTable),
             sql.run(createPlayerTable),
@@ -40,17 +40,16 @@ bot.on("ready", () => {
             sql.run(createGameScoreTable),
             sql.run(createGamePlayerTeamTable)
             //Add Teams
-          ]);
-    }).then(()=>{
+        ]);
+    }).then(() => {
         return Promise.all([
             sql.run(InsertTeamBE),
             sql.run(InsertTeamDS)
             //Add Teams
-          ]);
-    }).then(()=>{
+        ]);
+    }).then(() => {
         sql.close();
     })
     console.log("Setting up database");
 })
 bot.login(process.env.TOKEN);
-
