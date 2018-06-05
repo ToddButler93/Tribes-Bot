@@ -15,6 +15,7 @@ class InsertGameCommand extends commando.Command {
             }]
         });
         this.gameID;
+        this.gameDate;
         this.mapName;
         this.gameDataString;
         this.gameDataArray = [];
@@ -22,15 +23,18 @@ class InsertGameCommand extends commando.Command {
         this.dsGameData = [];
         this.beScore;
         this.dsScore;
-        this.winner;
+        this.date;
     }
 
     run(message, {
         gameData
     }) {
         return sql.open("./sql/stats.sqlite").then(() => {
-                return this.gameDataString = gameData.replace(/ *\[[^\]]*]/g, '').replace(/ /g, '').replace(/TrCTF-/g, '');
-            })
+            return Promise.all([
+                this.gameDataString = gameData.replace(/ *\[[^\]]*]/g, '').replace(/ /g, '').replace(/TrCTF-/g, ''),
+                this.date = new Date(),
+                this.gameDate = "" + this.date.getFullYear() + "" +  ('0' + (this.date.getMonth() + 1)).slice(-2)  + "" +  ('0' + this.date.getDate()).slice(-2)
+            ])})
             .then(() => {
                 return Promise.all([
                     //Split teams
@@ -40,8 +44,7 @@ class InsertGameCommand extends commando.Command {
                     this.dsGameData = this.gameDataArray[1].split(','),
                     this.mapName = this.beGameData[0].replace(/([A-Z])/g, ' $1').trim(),
                     this.beScore = this.beGameData[1],
-                    this.dsScore = this.dsGameData[1],
-                    this.winner = this.beGameData[1] > this.dsGameData[1] ? "Blood Eagle" : "Diamond Sword"
+                    this.dsScore = this.dsGameData[1]
                 ]);
             }) //Vaiidate
             .then(() => {
@@ -63,8 +66,12 @@ class InsertGameCommand extends commando.Command {
                     return
                 }
             }).then(() => {
-                message.channel.send("Map: " + this.mapName +
-                    "\nWinner: " + this.winner +
+                var formattedDate = [this.gameDate.slice(0, 4), "/", this.gameDate.slice(4)].join('');
+                formattedDate = [formattedDate.slice(0, 7), "/", formattedDate.slice(7)].join('');
+
+                message.channel.send("Game Date: " + formattedDate +
+                    "\nMap: " + this.mapName +
+                    "\nWinner: " + (this.beScore > this.dsScore ? "Blood Eagle" : "Diamond Sword") +
                     "\nBlood Eagle Score: " + this.beScore +
                     "\nDiamond Sword Score: " + this.dsScore +
                     "\nBlood Ealge Players: " + this.beGameData[2] + ", " + this.beGameData[3] + ", " + this.beGameData[4] + ", " + this.beGameData[5] + ", " + this.beGameData[6] + ", " + this.beGameData[7] + ", " + this.beGameData[8] +
@@ -133,7 +140,8 @@ class InsertGameCommand extends commando.Command {
     }
 
     insertGameMap() {
-        return sql.run("INSERT INTO gameMap VALUES (NULL,?)", this.mapID).then(row => {
+        console.log(this.gameDate);
+        return sql.run("INSERT INTO gameMap VALUES (NULL,?,?)", [this.mapID, this.gameDate]).then(row => {
             return sql.get("SELECT MAX(gameID) AS id FROM gameMap").then(row => {
                 console.log("Inserted Game Map. Game ID: " + row.id);
                 return this.gameID = row.id;

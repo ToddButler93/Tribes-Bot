@@ -4,15 +4,16 @@ const sql = require("sqlite");
 class ViewLatestGameStatsCommand extends commando.Command {
   constructor(client) {
     super(client, {
-      name: 'viewlateststats',
+      name: 'latest',
       group: 'stats',
-      memberName: 'viewlateststats',
+      memberName: 'latest',
       description: 'View Latest Match Stats'
     });
     this.gameID;
     this.mapName;
     this.bePlayers = [];
     this.dsPlayers = [];
+    this.gameDate;
   }
 
   run(message) {
@@ -23,17 +24,22 @@ class ViewLatestGameStatsCommand extends commando.Command {
         return Promise.all([
           this.getScore(0),
           this.getScore(1),
+          this.getDate(),
           this.getMap(),
           this.getPlayers(0),
           this.getPlayers(1)
         ]);
       }).then(data => {
-        message.channel.send("Map: " + this.mapName +
-          "\nWinnder: " + data[0] > data[1] ? "Blood Eagle" : "Diamond Sword" +
-          "\nBlood Eagle Score: " + data[0] +
-          "\nDiamond Sword Score: " + data[1] +
-          "\nBlood Ealge Players: " + this.bePlayers.join(', ') +
-          "\nDiamond Sword Players: " + this.dsPlayers.join(', '));
+        var formattedDate = "" + [this.gameDate.slice(0, 4), "/", this.gameDate.slice(4)].join('');
+        formattedDate = [formattedDate.slice(0, 7), "/", formattedDate.slice(7)].join('');
+
+        message.channel.send("Game Date: " + formattedDate +
+        "\nMap: " + this.mapName +
+        "\nWinner: " + (data[0] > data[1] ? "Blood Eagle" : "Diamond Sword") +
+        "\nBlood Eagle Score: " + data[0] +
+        "\nDiamond Sword Score: " + data[1] +
+        "\nBlood Ealge Players: " + this.bePlayers.join(', ') +
+        "\nDiamond Sword Players: " + this.dsPlayers.join(', '));
       }).then(() => {
         sql.close();
       });
@@ -63,6 +69,19 @@ class ViewLatestGameStatsCommand extends commando.Command {
           this.mapName = row.name;
           return
         });
+      });
+    });
+  }
+
+  getDate() {
+    return sql.get("SELECT * FROM gameMap WHERE gameID = (?)", this.gameID).then(row => {
+      if (!row) {
+        console.error("Matching gameID doesn not exist!");
+        return
+      }
+      return sql.get("SELECT gameDate as date FROM gameMap WHERE gameID = (?)", this.gameID).then(row => {
+        this.gameDate = row.date;
+        return this;
       });
     });
   }
