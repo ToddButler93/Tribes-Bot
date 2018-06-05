@@ -52,14 +52,14 @@ function listGames(auth) {
   sheets.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEETID,
     //Date,MapName,Blood Eagle Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7,Diamond Sword Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7
-    range: 'Raw Export Data!A1:R2',
+    range: 'Raw Export Data!A2:T',
   }, (err, {data}) => {
     if (err) return console.log('The API returned an error: ' + err);
     const rows = data.values;
     if (rows.length) {
       rows.map((row) => {
         console.log('Game : ');
-        console.log(`${row[0]}, ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]}, ${row[10]}, ${row[11]}, ${row[12]}, ${row[13]}, ${row[14]}, ${row[15]}, ${row[16]}, ${row[17]}`);
+        console.log(`${row[0]}, ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]}, ${row[10]}, ${row[11]}, ${row[12]}, ${row[13]}, ${row[14]}, ${row[15]}, ${row[16]}, ${row[17]}, ${row[18]}, ${row[19]}`);
       });
     } else {
       console.log('No data found.');
