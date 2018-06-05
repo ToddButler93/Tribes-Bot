@@ -6,9 +6,9 @@ const sql = require("sqlite");
 class ViewStatsCommand extends commando.Command {
     constructor(client) {
         super(client, {
-            name: 'viewstats',
+            name: 'player',
             group: 'stats',
-            memberName: 'viewstats',
+            memberName: 'player',
             description: 'View Player Stats',
             args: [{
                 key: 'playerName',
@@ -16,7 +16,6 @@ class ViewStatsCommand extends commando.Command {
                 type: 'string'
             }]
         });
-        this.playerName;
         this.playerID;
         this.totalGames;
         this.gamesArray = [];
@@ -29,11 +28,11 @@ class ViewStatsCommand extends commando.Command {
     }
 
     run(message, {
-        gameData
+        playerName
     }) {
         message.channel.send("Dodge is the best player in Australia and all the ladies wish he'd blue plate them.");
         return sql.open("./sql/stats.sqlite").then(() => {
-                return this.getPlayerID(gameData);
+                return this.getPlayerID(playerName);
             })
             .then(() => {
                 if (this.playerID != -1) {
@@ -56,16 +55,16 @@ class ViewStatsCommand extends commando.Command {
 
     }
 
-    getPlayerID(gameData) {
+    getPlayerID(playerName) {
         this.playerID = 0;
-        return sql.get("SELECT playerID AS id FROM players WHERE playerName = (?)", gameData).then(row => {
+        return sql.get("SELECT playerID AS id FROM players WHERE playerName = (?)", playerName).then(row => {
             if (!row) {
                 this.playerID = -1;
                 this.playerName = "";
                 return this;
             } else {
                 this.playerID = row.id;
-                this.playerName = gameData;
+                this.playerName = playerName;
                 return this;
             }
         });
@@ -92,4 +91,4 @@ class ViewStatsCommand extends commando.Command {
         });
     }
 }
-module.exports = ViewStatsCommand;
+//module.exports = ViewStatsCommand;
