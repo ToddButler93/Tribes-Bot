@@ -13,16 +13,18 @@ const createSmurfTable = "CREATE TABLE IF NOT EXISTS smurfs( smurfName PRIMARY K
 
 const createMapsTable = "CREATE TABLE IF NOT EXISTS maps( mapID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, mapName text UNIQUE NOT NULL)";
 
-const createGameMapTable = "CREATE TABLE IF NOT EXISTS gameMap( gameID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, mapID INTEGER, FOREIGN KEY (mapID) REFERENCES maps(mapID))";
-const createGameScoreTable = "CREATE TABLE IF NOT EXISTS gameScore( gameID INTEGER NOT NULL, teamID INTEGER NOT NULL, score INTEGER, \
+const createGameMapTable = "CREATE TABLE IF NOT EXISTS gameMap( gameID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, mapID INTEGER NOT NULL, gameDate TEXT NOT NULL, FOREIGN KEY (mapID) REFERENCES maps(mapID))";
+//PlayerID in gameScore refers to the captain for that game/team, isn't a required field
+const createGameScoreTable = "CREATE TABLE IF NOT EXISTS gameScore( gameID INTEGER NOT NULL, teamID INTEGER NOT NULL, score INTEGER NOT NULL, playerID INTEGER, \
 FOREIGN KEY (gameID) REFERENCES gameMap(gameID),\
 FOREIGN KEY (teamID) REFERENCES teams(teamID),\
+FOREIGN KEY (playerID) REFERENCES players(playerID),\
 primary key (gameID, teamID))";
 
 const createGamePlayerTeamTable = "CREATE TABLE IF NOT EXISTS gamePlayerTeam( gameID INTEGER NOT NULL, teamID INTEGER NOT NULL, playerID INTEGER NOT NULL,\
 FOREIGN KEY (gameID) REFERENCES gameMap(gameID),\
 FOREIGN KEY (teamID) REFERENCES teams(teamID),\
-FOREIGN KEY (playerID) REFERENCES players(playerID)\
+FOREIGN KEY (playerID) REFERENCES players(playerID),\
 primary key (gameID, playerID))";
 
 bot.registry.registerGroup('stats', 'Stats');
