@@ -64,6 +64,7 @@ class ReadGoogleDocCommand extends commando.Command {
   }
   listGames(auth) {
     const sheets = google.sheets({version: 'v4', auth});
+    var games = [];
     sheets.spreadsheets.values.get({
       spreadsheetId: process.env.SPREADSHEETID,
       //Date,MapName,Blood Eagle Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7,Diamond Sword Score, Player1, Player2, Player3, Player4, Player5, Player6, Player7
@@ -73,13 +74,22 @@ class ReadGoogleDocCommand extends commando.Command {
       const rows = data.values;
       if (rows.length) {
         rows.map((row) => {
-          console.log(`${row[0]}, ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]}, ${row[10]}, ${row[11]}, ${row[12]}, ${row[13]}, ${row[14]}, ${row[15]}, ${row[16]}, ${row[17]}`);
-          
+          var game = {
+            date:`${row[0]}`, 
+            map:`${row[1]}`, 
+            beScore:`${row[2]}`, 
+            bePlayers:`${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}, ${row[7]}, ${row[8]}, ${row[9]}`, 
+            dsScore:`${row[10]}`, 
+            dsPlayers:`${row[11]}, ${row[12]}, ${row[13]}, ${row[14]}, ${row[15]}, ${row[16]}, ${row[17]}`
+          };
+          console.log("Date: " + game['date'] + " Map: " + game['map'] + " Blood Eagle Score: " + game['beScore'] + " Diamond Sword Score: " + game['dsScore']);
+          games.push(game);
         });
       } else {
         console.log('No data found.');
       }
-    });
+      console.log('Number of games imported: ' + games.length);
+    })
   }
 }
 
